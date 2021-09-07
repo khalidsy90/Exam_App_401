@@ -13,7 +13,7 @@ export class FavoriteChoclate extends Component {
                     <Card.Body>
                     <Card.Title>{item.title}</Card.Title>
                     <Button variant="primary" onClick={()=>{this.props.deleteChocolate(item)}}>delete</Button>
-                    <Button variant="primary">update</Button>
+                    <Button variant="primary" onClick={()=>this.props.showModal(item)}>update</Button>
                     </Card.Body>
                  </Card>   
                 })
