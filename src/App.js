@@ -11,9 +11,48 @@ import {
   Switch,
   Route
 } from "react-router-dom";
+import axios from 'axios'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 class App extends React.Component {
+  constructor(props){
+    super(props)
+    this.state={
+      Chocolates:[],
+      selectedChocolate:[],
+      favChocolate:[]
+    }
+  }
+async componentDidMount(){
+  console.log('componentDidMount running');
+  let allChocolate=await axios.get(`${process.env.REACT_APP_SERVER}/Chocolate`)
+  await this.setState({
+    Chocolates:allChocolate.data
+  })
+  console.log(this.state.Chocolates);
+}
 
+ addToFavorite=async(item)=>{
+  let info={
+    email:this.props.auth0.user.email,
+    title:item.title,
+    imageUrl:item.imageUrl
+  }
+
+let addNewRow=await axios.post(`${process.env.REACT_APP_SERVER}/Chocolate`,info)
+  this.setState({
+    favChocolate:addNewRow.data
+  })
+}
+
+deleteChocolate=async(item)=>{
+let del =await axios.delete(`${process.env.REACT_APP_SERVER}/Chocolate/${item._id}?email=${this.props.auth0.user.email}`)
+
+await this.setstate({
+  favChocolate:del.data
+})
+
+}
   render() {
     return(
       <>
@@ -22,7 +61,7 @@ class App extends React.Component {
             <Switch>
 
               <Route exact path="/">
-                {this.props.auth0.isAuthenticated ? <MyFavorites /> : <Login />}
+                {this.props.auth0.isAuthenticated ? <MyFavorites selectedChocolate={this.state.selectedChocolate} favChocolate={this.state.favChocolate} deleteChocolate={this.deleteChocolate}/> : <Login />}
               </Route>
 
               <Route path="/profile">
@@ -30,7 +69,7 @@ class App extends React.Component {
               </Route>
 
               <Route path="/getAPIData">
-                <AllDataAPI/>
+                <AllDataAPI getAllallChocolate={this.state.Chocolates} addToFavorite={this.addToFavorite}/>
               </Route>
               
             </Switch>
